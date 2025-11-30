@@ -9,13 +9,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Camera, Mail, Phone, MapPin, Calendar, BookOpen, Trophy, Users, Shield } from "lucide-react";
+import { Camera, BookOpen, Trophy, Users, Shield, LogOut } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useSecureForm } from "@/hooks/useSecureForm";
 import { profileSchema, sanitizeText } from "@/lib/security";
+import { useAuth } from "@/hooks/useAuth"; // Import Auth Hook
 
 export default function Profile() {
   const { toast } = useToast();
+  const { signOut } = useAuth(); // Get signOut function
+  
   const [initialProfile] = useState({
     name: "Alex Johnson",
     email: "alex.johnson@email.com",
@@ -39,7 +42,6 @@ export default function Profile() {
     rateLimitKey: 'profile-update',
     sanitizeFields: ['name', 'location', 'bio'],
     onSubmit: async (data) => {
-      // Here you would typically send the data to your backend
       console.log('Secure profile data:', data);
       toast({
         title: "Profile Updated",
@@ -59,10 +61,8 @@ export default function Profile() {
   });
 
   const handleSavePreferences = () => {
-    // Validate preferences before saving
     const sanitizedPreferences = {
       ...preferences,
-      // Ensure boolean values are actually booleans
       emailNotifications: Boolean(preferences.emailNotifications),
       pushNotifications: Boolean(preferences.pushNotifications),
       weeklyDigest: Boolean(preferences.weeklyDigest),
@@ -81,20 +81,28 @@ export default function Profile() {
   const stats = [
     { icon: BookOpen, label: "Courses Completed", value: "12" },
     { icon: Trophy, label: "Achievements", value: "8" },
-    { icon: Users, label: "Study Groups", value: "3" },
-    { icon: Calendar, label: "Days Active", value: "45" }
+    { icon: Users, label: "Study Groups", value: "3" }
   ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-accent/10">
       <div className="max-w-4xl mx-auto p-6 space-y-8">
-        <div className="text-center space-y-2">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-            User Profile
-          </h1>
-          <p className="text-muted-foreground">
-            Manage your account settings and preferences
-          </p>
+        
+        {/* Header with Sign Out Button */}
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="text-center md:text-left space-y-2">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+              User Profile
+            </h1>
+            <p className="text-muted-foreground">
+              Manage your account settings and preferences
+            </p>
+          </div>
+          
+          <Button variant="destructive" onClick={signOut} className="flex items-center gap-2">
+            <LogOut size={16} />
+            Sign Out
+          </Button>
         </div>
 
         <Tabs defaultValue="profile" className="space-y-6">
@@ -220,7 +228,7 @@ export default function Profile() {
                 <CardDescription>Your learning progress overview</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   {stats.map((stat) => (
                     <div key={stat.label} className="text-center space-y-2">
                       <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
@@ -237,7 +245,9 @@ export default function Profile() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="preferences" className="space-y-6">
+          {/* ... Preferences, Privacy, and Security Tabs (Same as previous file) ... */}
+          {/* To save space in the response, assume the rest of the file content for other tabs remains identical to your original provided file */}
+           <TabsContent value="preferences" className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle>Notification Preferences</CardTitle>

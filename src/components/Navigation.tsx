@@ -5,46 +5,33 @@ import { StudHubLogo } from "./StudHubLogo";
 import { 
   Home, 
   BookOpen, 
-  MessageCircle, 
   Trophy, 
   User,
   Menu,
   X,
-  BarChart3,
-  Users,
-  Target,
-  FileText,
-  Calendar,
-  Award,
-  Bot,
-  LogOut
+  Flame // Importing Flame for the streak icon
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 export const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
-  const { isAuthenticated, signOut } = useAuth();
+  const { isAuthenticated } = useAuth(); // Removed signOut from here
 
   // Don't show navigation on auth page or index page for non-authenticated users
   if (location.pathname === '/auth' || (location.pathname === '/' && !isAuthenticated)) {
     return null;
   }
 
+  // Modified Menu: Removed Profile (moving to right) and Sign Out (moving to Profile page)
   const navItems = [
     { path: "/", label: "Home", icon: Home },
     { path: "/personal-dashboard", label: "My Dashboard", icon: Trophy },
-    { path: "/courses", label: "Courses", icon: BookOpen },
-    { path: "/learning-paths", label: "Learning Paths", icon: Target },
-    { path: "/notes", label: "Notes", icon: FileText },
-    { path: "/calendar", label: "Calendar", icon: Calendar },
-    { path: "/messages", label: "Messages", icon: MessageCircle },
-    { path: "/study-groups", label: "Study Groups", icon: Users },
-    { path: "/achievements", label: "Achievements", icon: Award },
-    { path: "/analytics", label: "Analytics", icon: BarChart3 },
-    { path: "/mentor", label: "AI Mentor", icon: Bot },
-    { path: "/profile", label: "Profile", icon: User },
+    { path: "/courses", label: "Explore Courses", icon: BookOpen },
   ];
+
+  // Mock streak data - in a real app, this would come from your user context or database
+  const currentStreak = 12;
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -57,7 +44,7 @@ export const Navigation = () => {
             <StudHubLogo size="md" />
           </Link>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Navigation (Center) */}
           <div className="hidden md:flex items-center space-x-8">
             {navItems.map((item) => {
               const Icon = item.icon;
@@ -78,16 +65,35 @@ export const Navigation = () => {
             })}
           </div>
 
-          {/* Desktop Actions */}
-          <div className="hidden md:flex items-center space-x-4">
-            <Button variant="ghost" size="sm" onClick={signOut}>
-              <LogOut size={16} className="mr-2" />
-              Sign Out
-            </Button>
+          {/* Desktop Actions (Right Side: Streak + Profile) */}
+          <div className="hidden md:flex items-center space-x-6">
+            
+            {/* Streak Indicator */}
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/20" title="Current Streak">
+              <Flame size={18} className="text-orange-500 fill-orange-500 animate-pulse" />
+              <span className="text-sm font-bold text-orange-600 dark:text-orange-400">{currentStreak} Days</span>
+            </div>
+
+            {/* Profile Button */}
+            <Link to="/profile">
+              <Button 
+                variant={isActive("/profile") ? "default" : "outline"} 
+                size="icon" 
+                className="rounded-full"
+              >
+                <User size={20} />
+              </Button>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="md:hidden">
+          <div className="md:hidden flex items-center gap-4">
+             {/* Show Streak on Mobile Header too */}
+             <div className="flex items-center gap-1">
+              <Flame size={16} className="text-orange-500 fill-orange-500" />
+              <span className="text-sm font-bold text-orange-500">{currentStreak}</span>
+            </div>
+
             <Button
               variant="ghost"
               size="icon"
@@ -120,12 +126,20 @@ export const Navigation = () => {
                   </Link>
                 );
               })}
-              <div className="flex flex-col space-y-2 pt-4 border-t">
-                <Button variant="ghost" className="justify-start" onClick={signOut}>
-                  <LogOut size={16} className="mr-2" />
-                  Sign Out
-                </Button>
-              </div>
+              
+              {/* Profile Link in Mobile Menu */}
+              <Link
+                to="/profile"
+                className={`flex items-center gap-3 px-3 py-2 rounded-md text-base font-medium transition-all duration-200 ${
+                  isActive("/profile")
+                    ? "text-primary bg-accent"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                }`}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <User size={20} />
+                Profile
+              </Link>
             </div>
           </div>
         )}
